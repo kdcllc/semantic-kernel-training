@@ -1,28 +1,19 @@
 ﻿using Microsoft.Extensions.Options;
 using Moedim.GenAI.Demos.Abstractions;
 
-public class Main : IMain
+public class Main(
+    IOptions<CliOptions> cliOptions,
+    IEnumerable<IDemo> demos,
+    IHostApplicationLifetime applicationLifetime,
+    IConfiguration configuration,
+    ILogger<Main> logger) : IMain
 {
-    private readonly ILogger<Main> _logger;
-    private readonly CliOptions _cliOptions;
-    private readonly IHostApplicationLifetime _applicationLifetime;
-    private readonly IEnumerable<IDemo> _demos;
+    private readonly ILogger<Main> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly CliOptions _cliOptions = cliOptions?.Value ?? throw new ArgumentNullException(nameof(cliOptions));
+    private readonly IHostApplicationLifetime _applicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
+    private readonly IEnumerable<IDemo> _demos = demos ?? throw new ArgumentNullException(nameof(demos));
 
-    public Main(
-        IOptions<CliOptions> cliOptions,
-        IEnumerable<IDemo> demos,
-        IHostApplicationLifetime applicationLifetime,
-        IConfiguration configuration,
-        ILogger<Main> logger)
-    {
-        _cliOptions = cliOptions?.Value ?? throw new ArgumentNullException(nameof(cliOptions));
-        _demos = demos ?? throw new ArgumentNullException(nameof(demos));
-        _applicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
-        Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    public IConfiguration Configuration { get; set; }
+    public IConfiguration Configuration { get; set; } = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
     public async Task<int> RunAsync()
     {
