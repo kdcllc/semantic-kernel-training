@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+
 using Moedim.GenAI.Demos.Abstractions;
 
 public class Main(
@@ -17,15 +18,17 @@ public class Main(
 
     public async Task<int> RunAsync()
     {
-        _logger.LogInformation("Requested: {optionType}", _cliOptions.Type);
+        _logger.LogInformation("Requested demo: {optionType}", _cliOptions.Type);
 
         var demo = _demos.FirstOrDefault(x => x.Name.Equals(_cliOptions?.Type?.Trim(), StringComparison.OrdinalIgnoreCase));
 
-        await demo.RunAsync();
-        
-        // use this token for stopping the services
-        _applicationLifetime.ApplicationStopping.ThrowIfCancellationRequested();
+        if (demo != null)
+        {
+            await demo.RunAsync(_applicationLifetime.ApplicationStopping);
 
-        return 0;
+            return 0;
+        }
+
+        return -1;
     }
 }

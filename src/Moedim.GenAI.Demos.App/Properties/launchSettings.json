@@ -1,7 +1,8 @@
 {
   "profiles": {
-    "Console.Di": {
+    "Demos.App": {
       "commandName": "Project",
+      "commandLineArgs": "-t basic",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },

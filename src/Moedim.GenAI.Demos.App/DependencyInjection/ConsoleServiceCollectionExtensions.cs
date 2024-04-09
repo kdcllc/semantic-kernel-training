@@ -1,7 +1,4 @@
-﻿using Moedim.GenAI.Demos.Abstractions.Options;
-using Moedim.GenAI.Demos.Abstractions;
-
-namespace Microsoft.Extensions.DependencyInjection;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ConsoleServiceCollectionExtensions
 {
@@ -9,11 +6,6 @@ public static class ConsoleServiceCollectionExtensions
     {
         services.AddScoped<IMain, Main>();
 
-        // add options for OpenAIOptions with validation
-        services.AddOptions<OpenAIOptions>()
-                .Bind(hostBuilder.Configuration.GetSection(nameof(OpenAIOptions)))
-                .ValidateDataAnnotations();
-
-        services.AddScoped<IDemo, BasicDemo>();
+        services.AddDemosKernel();
     }
 }

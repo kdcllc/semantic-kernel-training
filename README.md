@@ -29,3 +29,8 @@ This code utilizes Azure Key Vault to store secure values. It is possible to rep
     dotnet run -- -t basic
 
 ```
+
+
+## References
+
+- [Using Semantic Kernel with Dependency Injection](https://devblogs.microsoft.com/semantic-kernel/using-semantic-kernel-with-dependency-injection/)

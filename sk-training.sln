@@ -5,9 +5,17 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2A5493FC-2836-44FE-AA83-E048C12293F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moedim.GenAI.Demos.Abstractions", "src\Moedim.GenAI.Demos.Abstractions\Moedim.GenAI.Demos.Abstractions.csproj", "{D291380B-4398-4B93-9EE3-67AA7B81AF9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.GenAI.Demos.Abstractions", "src\Moedim.GenAI.Demos.Abstractions\Moedim.GenAI.Demos.Abstractions.csproj", "{D291380B-4398-4B93-9EE3-67AA7B81AF9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moedim.GenAI.Demos.App", "src\Moedim.GenAI.Demos.App\Moedim.GenAI.Demos.App.csproj", "{2B10F463-60B9-4BF2-A30F-45A5CAB2B907}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.GenAI.Demos.App", "src\Moedim.GenAI.Demos.App\Moedim.GenAI.Demos.App.csproj", "{2B10F463-60B9-4BF2-A30F-45A5CAB2B907}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9C78A50F-D312-48FD-A2C3-EBC08EEBF761}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		create-kv.sh = create-kv.sh
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
