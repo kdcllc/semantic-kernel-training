@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DemosAbstractionsServiceCollectionExtensions
 {
-    public static IServiceCollection AddDemosKernel(this IServiceCollection services)
+    public static IServiceCollection AddOpenAIOptions(this IServiceCollection services)
     {
         // add options for OpenAIOptions with validation
         services.AddOptions<OpenAIOptions>()
@@ -21,8 +21,14 @@ public static class DemosAbstractionsServiceCollectionExtensions
                     c.GetSection(nameof(OpenAIOptions)).Bind(o);
                 });
 
-        
-        // add chat completion service seperately
+        return services;
+    }
+
+    public static IServiceCollection AddBasicDemoKernel(this IServiceCollection services)
+    {
+
+       
+        // add chat completion service separately
         services.AddSingleton<IChatCompletionService>(sp =>
         {
             var options = sp.GetRequiredService<IOptions<OpenAIOptions>>().Value;
@@ -36,7 +42,7 @@ public static class DemosAbstractionsServiceCollectionExtensions
             return new OpenAIChatCompletionService(options.CompletionModelId, options.Key);
         });
 
-        services.AddKeyedTransient<Kernel>("DemosnKernel", (sp, key) =>
+        services.AddKeyedTransient<Kernel>("basic", (sp, key) =>
         {
             // Create a collection of plugins that the kernel will use
             KernelPluginCollection pluginCollection = new();
@@ -45,7 +51,14 @@ public static class DemosAbstractionsServiceCollectionExtensions
         });
 
         // add basic demo
-        services.AddTransient<IDemo, BasicDemo>();
+        services.AddTransient<IDemo>(sp =>{
+            var kernel = sp.GetKeyedService<Kernel>("basic");
+            if (kernel == null)
+            {
+                throw new InvalidOperationException("Kernel not found");
+            }
+            return new BasicDemo(kernel);
+        });
 
         return services;
     }

@@ -15,20 +15,16 @@ namespace Moedim.GenAI.Demos.Abstractions;
 /// <summary>
 /// Represents a base class for demos.
 /// </summary>
-public abstract class BaseDemo : IDemo
+/// <remarks>
+/// Initializes a new instance of the <see cref="BaseDemo"/> class.
+/// </remarks>
+/// <param name="options">The OpenAI options.</param>
+/// <param name="loggerFactory">The logger factory.</param>
+public abstract class BaseDemo(Kernel kernel) : IDemo
 {
-    private Kernel? _kernel;
-    private ChatHistory _history = [];
+    private Kernel? _kernel = kernel;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BaseDemo"/> class.
-    /// </summary>
-    /// <param name="options">The OpenAI options.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    public BaseDemo([FromKeyedServices("DemosnKernel")] Kernel kernel)
-    {
-        _kernel = kernel;
-    }
+    protected ChatHistory _history = [];
 
     /// <summary>
     /// Gets the name of the demo.
@@ -41,7 +37,7 @@ public abstract class BaseDemo : IDemo
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        _history.AddSystemMessage(@"You're a virtual assistant that helps people find information.");
+        _history.AddSystemMessage(SystemMessage);
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -60,6 +56,8 @@ public abstract class BaseDemo : IDemo
                 break;
             }
 
+            _history.AddUserMessage(query);
+
             var result = await HandlePrompt(_kernel!, query);
 
             if (result is null)
@@ -77,7 +75,12 @@ public abstract class BaseDemo : IDemo
     /// <summary>
     /// Gets the screen prompt for the demo.
     /// </summary>
-    public virtual string ScreenPrompt => "How can I help you?";
+    public virtual string ScreenPrompt => "How can I help you? (if done type 'exit')";
+
+    /// <summary>
+    /// Gets the system message for the demo.
+    /// </summary>
+    public virtual string SystemMessage => "You're a virtual assistant that helps people find information.";
 
     /// <summary>
     /// Handles the user prompt and returns the response.

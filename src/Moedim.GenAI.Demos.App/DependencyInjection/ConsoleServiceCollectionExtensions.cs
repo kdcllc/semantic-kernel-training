@@ -6,6 +6,10 @@ public static class ConsoleServiceCollectionExtensions
     {
         services.AddScoped<IMain, Main>();
 
-        services.AddDemosKernel();
+        // this only needs to be added once.
+        services.AddOpenAIOptions();
+        
+        // the other services are added in the Main class
+        services.AddBasicDemoKernel();
     }
 }

@@ -6,7 +6,7 @@ namespace Moedim.GenAI.Demos.Abstractions;
 /// <summary>
 /// Represents a basic demo of getting prompt executed part of the kernel.
 /// </summary>
-public class BasicDemo([FromKeyedServices("DemosnKernel")] Kernel kernel) : BaseDemo(kernel)
+public class BasicDemo(Kernel kernel) : BaseDemo(kernel)
 {
     /// <summary>
     /// Gets the name of the basic demo.
