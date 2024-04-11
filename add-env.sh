@@ -1,5 +1,15 @@
 #!/bin/bash
 
+echo "Before running this script make sure you are logged in with Azure CLI."
+
+# Check if the Azure CLI is installed
+if ! [ -x "$(command -v az)" ]; then
+    echo "Error: Azure CLI is not installed. Please install it before running this script."
+    exit 1
+else
+    echo "Azure CLI is installed"
+fi
+
 # Prompt for resource group and vault name
 echo "Please enter the vault name:"
 read vaultName
@@ -22,18 +32,12 @@ if [ ! -f "$env_file" ]; then
         if [ -z "$value" ]; then
             echo "No value returned for $name from Key Vault $vaultName"
             continue
-        fi
-        echo "$key_vault_name_with_dash=$value" >> $env_file
-        
-        echo "Settting $key_vault_name_with_dash"
-        export $key_vault_name_with_dash="$value"
-        #printenv | grep $key_vault_name_with_dash
-
-        # Check if the export was successful
-        if [ -z "${!key_vault_name_with_dash}" ]; then
-            echo "Failed to export $key_vault_name_with_dash"
         else
+            echo "Successfully retrieved $name from Key Vault $vaultName"
+            echo "$key_vault_name_with_dash=$value" >> $env_file
             echo "Successfully exported $key_vault_name_with_dash"
         fi
     done
+else
+    echo "The $env_file file already exists"
 fi

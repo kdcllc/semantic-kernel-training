@@ -38,6 +38,7 @@ try
 
     using var host = AppHost
                     .CreateHostBuilder()
+                    .ConfigureAppConfiguration(x => x.AddUserSecrets<Program>())
                     .ConfigureServices(services =>
                     {
                         services.AddOptions<CliOptions>()
