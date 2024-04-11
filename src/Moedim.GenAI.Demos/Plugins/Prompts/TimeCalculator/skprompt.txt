@@ -1,0 +1,9 @@
+Based on the user input, calculate the date and time.
+
+Today is: {{time.Date}}
+Current time is: {{time.Time}}
+Current UTC time is: {{time.UtcNow}}
+
++++
+Input: {{$input}}
+Result:

@@ -15,6 +15,7 @@ public static class DemosAbstractionsServiceCollectionExtensions
     public static IServiceCollection AddKeyedKernel<TDemo>(
         this IServiceCollection services,
         Func<IServiceProvider, Kernel, TDemo> configureDemo,
+        Action<IServiceProvider, KernelPluginCollection>? configuePlugins=null,
         string? name = null) where TDemo : class, IDemo
     {
         // default keyed value
@@ -49,7 +50,7 @@ public static class DemosAbstractionsServiceCollectionExtensions
             });
 
 
-        services.TryAddKeyedTransient<Kernel>(
+        services.TryAddKeyedSingleton<Kernel>(
             keyed, 
             (sp, key) =>
             {
@@ -57,11 +58,16 @@ public static class DemosAbstractionsServiceCollectionExtensions
                 // Create a collection of plugins that the kernel will use
                 KernelPluginCollection pluginCollection = new();
 
+                if (configuePlugins != null)
+                {
+                    configuePlugins(sp, pluginCollection);
+                }
+
                 return new Kernel(sp, pluginCollection);
             });
 
         // add demo
-        services.TryAddTransient<IDemo>(sp =>{
+        services.AddSingleton<IDemo>(sp =>{
             var kernel = sp.GetKeyedService<Kernel>(keyed);
             if (kernel == null)
             {

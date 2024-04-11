@@ -19,7 +19,7 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
 {
     private Kernel? _kernel = kernel;
 
-    protected ChatHistory _history = [];
+    public ChatHistory History = [];
 
     /// <summary>
     /// Gets the name of the demo.
@@ -32,7 +32,7 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        _history.AddSystemMessage(SystemMessage);
+        History.AddSystemMessage(SystemMessage);
 
         SystemMessage.Dump(colors: new ColorConfig { PropertyValueColor = Color.YellowGreen} );
 
@@ -53,7 +53,7 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
                 break;
             }
 
-            _history.AddUserMessage(query);
+            History.AddUserMessage(query);
 
             var result = await HandlePrompt(_kernel!, query);
 
@@ -63,7 +63,7 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
             }
             else
             {
-                _history.AddAssistantMessage(result);
+                History.AddAssistantMessage(result);
                 result.Dump();
             }
         }

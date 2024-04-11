@@ -7,12 +7,12 @@ namespace Moedim.GenAI.Demos.BasicDemos;
 /// <summary>
 /// Represents a basic demo of getting prompt executed part of the kernel.
 /// </summary>
-public class ChatDemo01(Kernel kernel) : BaseDemo(kernel)
+public class ChatSimpleDemo(Kernel kernel) : BaseDemo(kernel)
 {
     /// <summary>
     /// Gets the name of the basic demo.
     /// </summary>
-    public override string Name => nameof(ChatDemo01);
+    public override string Name => nameof(ChatSimpleDemo);
 
     /// <summary>
     /// Handles the user prompt and returns the response.

@@ -26,7 +26,7 @@ This code utilizes Azure Key Vault to store secure values. It is possible to rep
 
 ```bash
 
-    dotnet run -- -t basic
+    dotnet run -- -t ChatSimpleDemo
 
 ```
 
