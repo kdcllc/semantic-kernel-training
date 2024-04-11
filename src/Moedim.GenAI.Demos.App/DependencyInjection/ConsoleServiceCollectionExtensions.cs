@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Extensions.DependencyInjection;
+﻿using Moedim.GenAI.Demos.BasicDemos;
+
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ConsoleServiceCollectionExtensions
 {
@@ -6,10 +8,11 @@ public static class ConsoleServiceCollectionExtensions
     {
         services.AddScoped<IMain, Main>();
 
-        // this only needs to be added once.
-        services.AddOpenAIOptions();
-        
         // the other services are added in the Main class
-        services.AddBasicDemoKernel();
+        services.AddKeyedKernel((sp, kernel) =>
+        {
+            return new ChatDemo01(kernel);
+        });
+
     }
 }

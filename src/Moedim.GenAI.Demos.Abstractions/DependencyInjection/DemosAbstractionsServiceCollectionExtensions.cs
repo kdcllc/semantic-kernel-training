@@ -1,63 +1,73 @@
-﻿using Moedim.GenAI.Demos.Abstractions.Options;
-using Moedim.GenAI.Demos.Abstractions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.SemanticKernel.ChatCompletion;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+
+using Moedim.GenAI.Demos.Abstractions;
+using Moedim.GenAI.Demos.Abstractions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DemosAbstractionsServiceCollectionExtensions
 {
-    public static IServiceCollection AddOpenAIOptions(this IServiceCollection services)
+    public static IServiceCollection AddKeyedKernel<TDemo>(
+        this IServiceCollection services,
+        Func<IServiceProvider, Kernel, TDemo> configureDemo,
+        string? name = null) where TDemo : class, IDemo
     {
-        // add options for OpenAIOptions with validation
-        services.AddOptions<OpenAIOptions>()
-                .ValidateOnStart()
-                .ValidateDataAnnotations()
-                .Configure<IConfiguration>((o, c) =>
-                {
-                    c.GetSection(nameof(OpenAIOptions)).Bind(o);
-                });
+        // default keyed value
+        var keyed = typeof(TDemo).Name;
 
-        return services;
-    }
-
-    public static IServiceCollection AddBasicDemoKernel(this IServiceCollection services)
-    {
-
-       
-        // add chat completion service separately
-        services.AddSingleton<IChatCompletionService>(sp =>
+        if (!string.IsNullOrWhiteSpace(name))
         {
-            var options = sp.GetRequiredService<IOptions<OpenAIOptions>>().Value;
+            keyed = name;
+        }
 
-            if (options.Azure)
+        services.AddOptions<OpenAIOptions>("global")
+            .ValidateOnStart()
+            .ValidateDataAnnotations()
+            .Configure<IConfiguration>((o, c) =>
             {
-                // this is where we can change from api key to managed identity
-                return new AzureOpenAIChatCompletionService(options.CompletionModelId, options.Endpoint, options.Key);
-            }
+                c.GetSection(nameof(OpenAIOptions)).Bind(o);
+            });
 
-            return new OpenAIChatCompletionService(options.CompletionModelId, options.Key);
-        });
+        // add chat completion service separately
+        services.TryAddSingleton<IChatCompletionService>(
+            sp =>
+            {
+                var options = sp.GetRequiredService<IOptionsMonitor<OpenAIOptions>>().Get("global");
 
-        services.AddKeyedTransient<Kernel>("basic", (sp, key) =>
-        {
-            // Create a collection of plugins that the kernel will use
-            KernelPluginCollection pluginCollection = new();
+                if (options.Azure)
+                {
+                    // this is where we can change from api key to managed identity
+                    return new AzureOpenAIChatCompletionService(options.CompletionModelId, options.Endpoint, options.Key);
+                }
 
-            return new Kernel(sp, pluginCollection);
-        });
+                return new OpenAIChatCompletionService(options.CompletionModelId, options.Key);
+            });
 
-        // add basic demo
-        services.AddTransient<IDemo>(sp =>{
-            var kernel = sp.GetKeyedService<Kernel>("basic");
+
+        services.TryAddKeyedTransient<Kernel>(
+            keyed, 
+            (sp, key) =>
+            {
+                var kernel = Kernel.CreateBuilder();
+                // Create a collection of plugins that the kernel will use
+                KernelPluginCollection pluginCollection = new();
+
+                return new Kernel(sp, pluginCollection);
+            });
+
+        // add demo
+        services.TryAddTransient<IDemo>(sp =>{
+            var kernel = sp.GetKeyedService<Kernel>(keyed);
             if (kernel == null)
             {
                 throw new InvalidOperationException("Kernel not found");
             }
-            return new BasicDemo(kernel);
+            return configureDemo(sp, kernel);
         });
 
         return services;

@@ -1,12 +1,7 @@
 ﻿using Dumpify;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-
-using Moedim.GenAI.Demos.Abstractions.Options;
 
 using System.Drawing;
 
@@ -38,6 +33,8 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         _history.AddSystemMessage(SystemMessage);
+
+        SystemMessage.Dump(colors: new ColorConfig { PropertyValueColor = Color.YellowGreen} );
 
         while (!cancellationToken.IsCancellationRequested)
         {

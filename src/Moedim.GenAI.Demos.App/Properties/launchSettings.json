@@ -2,7 +2,7 @@
   "profiles": {
     "Demos.App": {
       "commandName": "Project",
-      "commandLineArgs": "-t basic",
+      "commandLineArgs": "-t ChatDemo01",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },
