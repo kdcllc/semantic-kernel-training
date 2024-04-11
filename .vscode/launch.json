@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "Debug: Demos.App",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\src\\Moedim.GenAI.Demos.App\\Moedim.GenAI.Demos.App.csproj",
+            "launchConfigurationId": "TargetFramework=;Demos.App",
+            "envFile": "${workspaceFolder}/.env.azure"
+        }
+    ]
+}
