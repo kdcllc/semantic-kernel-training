@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# enable script
+chmod +x add-secrets.sh
+
 # Prompt for resource group and vault name
 echo "Please enter the vault name:"
 read vaultName

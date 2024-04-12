@@ -1,7 +1,13 @@
 {
     "configurations": [
         {
-            "name": "Debug: Demos.App",
+            "name": "Linux: Demos.App",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/src/Moedim.GenAI.Demos.App/Moedim.GenAI.Demos.App.csproj"
+        },
+        {
+            "name": "Win: Demos.App",
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}\\src\\Moedim.GenAI.Demos.App\\Moedim.GenAI.Demos.App.csproj",
