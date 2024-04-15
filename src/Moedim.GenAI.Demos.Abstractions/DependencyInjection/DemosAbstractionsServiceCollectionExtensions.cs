@@ -15,7 +15,6 @@ public static class DemosAbstractionsServiceCollectionExtensions
     public static IServiceCollection AddKeyedKernel<TDemo>(
         this IServiceCollection services,
         Func<IServiceProvider, Kernel, TDemo> configureDemo,
-        Action<IServiceProvider, KernelPluginCollection>? configurePlugins=null,
         string? name = null) where TDemo : class, IDemo
     {
         // default keyed value
@@ -58,15 +57,7 @@ public static class DemosAbstractionsServiceCollectionExtensions
                         serviceId: keyed);
                 }
   
-                // Create a collection of plugins that the kernel will use
-                KernelPluginCollection pluginCollection = new();
-
-                if (configurePlugins != null)
-                {
-                    configurePlugins(sp, pluginCollection);
-                }
-
-                return new Kernel(sp, pluginCollection);
+                return kernel.Build();
             });
 
         // add demo
@@ -76,8 +67,6 @@ public static class DemosAbstractionsServiceCollectionExtensions
             {
                 throw new InvalidOperationException("Kernel not found");
             }
-            var t = sp.GetRequiredKeyedService<IChatCompletionService>(keyed);
-
             return configureDemo(sp, kernel);
         });
 

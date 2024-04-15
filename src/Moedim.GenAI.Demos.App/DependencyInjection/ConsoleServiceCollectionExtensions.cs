@@ -32,12 +32,11 @@ public static class ConsoleServiceCollectionExtensions
                 KernelPlugin[] plugins = [kernel.CreatePluginFromPromptDirectory("../Moedim.GenAI.Demos/Plugins/Prompts/"),];
                 kernel.Plugins.AddRange (plugins);
 
-                return new ChatTimePluginDemo(kernel);
-            },
-            configurePlugins: (sp, col) =>
-            {
+                // typed plugin
                 var plug = sp.GetRequiredKeyedService<TimePlugin>("time");
-                col.AddFromObject(plug, "time");
+                kernel.Plugins.AddFromObject(plug, "time");
+
+                return new ChatTimePluginDemo(kernel);
             });
     }
 }
