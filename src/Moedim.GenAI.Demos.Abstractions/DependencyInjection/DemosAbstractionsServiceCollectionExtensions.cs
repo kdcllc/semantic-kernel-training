@@ -76,6 +76,8 @@ public static class DemosAbstractionsServiceCollectionExtensions
             {
                 throw new InvalidOperationException("Kernel not found");
             }
+            var t = sp.GetRequiredKeyedService<IChatCompletionService>(keyed);
+
             return configureDemo(sp, kernel);
         });
 
