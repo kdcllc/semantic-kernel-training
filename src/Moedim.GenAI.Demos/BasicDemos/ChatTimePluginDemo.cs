@@ -8,6 +8,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Planning.Handlebars;
 
+
 using Moedim.GenAI.Demos.Abstractions;
 
 namespace Moedim.GenAI.Demos.BasicDemos;
@@ -77,7 +78,7 @@ public class ChatTimePluginDemo(Kernel kernel) : BaseDemo(kernel)
         //return result;
 
         // Get chat completion service
-        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>(nameof(ChatTimePluginDemo));
 
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {

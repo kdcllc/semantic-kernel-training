@@ -15,7 +15,7 @@ public static class DemosAbstractionsServiceCollectionExtensions
     public static IServiceCollection AddKeyedKernel<TDemo>(
         this IServiceCollection services,
         Func<IServiceProvider, Kernel, TDemo> configureDemo,
-        Action<IServiceProvider, KernelPluginCollection>? configuePlugins=null,
+        Action<IServiceProvider, KernelPluginCollection>? configurePlugins=null,
         string? name = null) where TDemo : class, IDemo
     {
         // default keyed value
@@ -26,7 +26,7 @@ public static class DemosAbstractionsServiceCollectionExtensions
             keyed = name;
         }
 
-        services.AddOptions<OpenAIOptions>("global")
+        services.AddOptions<OpenAIOptions>(keyed)
             .ValidateOnStart()
             .ValidateDataAnnotations()
             .Configure<IConfiguration>((o, c) =>
@@ -34,33 +34,36 @@ public static class DemosAbstractionsServiceCollectionExtensions
                 c.GetSection(nameof(OpenAIOptions)).Bind(o);
             });
 
-        // add chat completion service separately
-        services.TryAddSingleton<IChatCompletionService>(
-            sp =>
-            {
-                var options = sp.GetRequiredService<IOptionsMonitor<OpenAIOptions>>().Get("global");
-
-                if (options.Azure)
-                {
-                    // this is where we can change from api key to managed identity
-                    return new AzureOpenAIChatCompletionService(options.CompletionModelId, options.Endpoint, options.Key);
-                }
-
-                return new OpenAIChatCompletionService(options.CompletionModelId, options.Key);
-            });
-
-
         services.TryAddKeyedSingleton<Kernel>(
             keyed, 
             (sp, key) =>
             {
+                var options = sp.GetRequiredService<IOptionsMonitor<OpenAIOptions>>().Get(keyed);
+
                 var kernel = Kernel.CreateBuilder();
+
+                if (options.Azure)
+                {
+                    kernel.AddAzureOpenAIChatCompletion(
+                        options.CompletionModelId, 
+                        options.Endpoint, 
+                        options.Key,
+                        serviceId: keyed);
+                }
+                else
+                {
+                    kernel.AddOpenAIChatCompletion(
+                        options.CompletionModelId, 
+                        options.Key,
+                        serviceId: keyed);
+                }
+  
                 // Create a collection of plugins that the kernel will use
                 KernelPluginCollection pluginCollection = new();
 
-                if (configuePlugins != null)
+                if (configurePlugins != null)
                 {
-                    configuePlugins(sp, pluginCollection);
+                    configurePlugins(sp, pluginCollection);
                 }
 
                 return new Kernel(sp, pluginCollection);

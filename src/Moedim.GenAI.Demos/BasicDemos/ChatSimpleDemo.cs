@@ -22,6 +22,12 @@ public class ChatSimpleDemo(Kernel kernel) : BaseDemo(kernel)
     /// <returns>The response to the user prompt.</returns>
     protected override async Task<string?> HandlePrompt(Kernel kernel, string userPrompt)
     {
-        return await kernel.InvokePromptAsync<string>(userPrompt);
+        KernelArguments arguments = [];
+        arguments.ExecutionSettings = new Dictionary<string, PromptExecutionSettings>()
+        {
+            { nameof(ChatSimpleDemo), new PromptExecutionSettings() }
+        };
+
+        return await kernel.InvokePromptAsync<string>(userPrompt, arguments);
     }
 }

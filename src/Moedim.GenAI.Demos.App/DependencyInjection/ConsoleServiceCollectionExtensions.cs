@@ -34,7 +34,7 @@ public static class ConsoleServiceCollectionExtensions
 
                 return new ChatTimePluginDemo(kernel);
             },
-            configuePlugins: (sp, col) =>
+            configurePlugins: (sp, col) =>
             {
                 var plug = sp.GetRequiredKeyedService<TimePlugin>("time");
                 col.AddFromObject(plug, "time");
