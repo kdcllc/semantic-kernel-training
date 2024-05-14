@@ -13,12 +13,13 @@ namespace Moedim.GenAI.Demos.Abstractions;
 /// <remarks>
 /// Initializes a new instance of the <see cref="BaseDemo"/> class.
 /// </remarks>
-/// <param name="options">The OpenAI options.</param>
-/// <param name="loggerFactory">The logger factory.</param>
 public abstract class BaseDemo(Kernel kernel) : IDemo
 {
     private Kernel? _kernel = kernel;
 
+    /// <summary>
+    /// Represents the chat history for the demo.
+    /// </summary>
     public ChatHistory History = [];
 
     /// <summary>

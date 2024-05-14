@@ -1,9 +1,4 @@
-﻿using Azure.AI.OpenAI;
-
-using Dumpify;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Planning.Handlebars;
@@ -13,17 +8,25 @@ using Moedim.GenAI.Demos.Abstractions;
 
 namespace Moedim.GenAI.Demos.BasicDemos;
 
+/// <summary>
+/// Represents a demo class for the ChatTimePlugin.
+/// </summary>
 public class ChatTimePluginDemo(Kernel kernel) : BaseDemo(kernel)
 {
 #pragma warning disable SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-    private HandlebarsPlanner _planner = new HandlebarsPlanner(new HandlebarsPlannerOptions());
+    
+    //private HandlebarsPlanner _planner = new HandlebarsPlanner(new HandlebarsPlannerOptions());
 
+    /// <inheritdoc/>
     public override string Name => nameof(ChatTimePluginDemo);
 
+    /// <inheritdoc/>
     public override string SystemMessage => "You're a AI assistant that only tells time, if other questions are asked reply with 'I only tell time'.";
 
+    /// <inheritdoc/>
     public override string ScreenPrompt => "What do you want to know about time?";
 
+    /// <inheritdoc/>
     protected override async Task<string?> HandlePrompt(Kernel kernel, string userPrompt)
     {
         //const string promptDef = @"
@@ -78,7 +81,7 @@ public class ChatTimePluginDemo(Kernel kernel) : BaseDemo(kernel)
         //return result;
 
         // Get chat completion service
-        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>(nameof(ChatTimePluginDemo));
+        var chatCompletionService = kernel?.GetRequiredService<IChatCompletionService>(nameof(ChatTimePluginDemo));
 
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {
@@ -90,9 +93,9 @@ public class ChatTimePluginDemo(Kernel kernel) : BaseDemo(kernel)
         // kernel.Plugins.Dump();
 
         history.AddUserMessage(userPrompt);
-        
+
         // Get the response from the AI
-        var result = await chatCompletionService.GetChatMessageContentAsync(
+        var result = await chatCompletionService!.GetChatMessageContentAsync(
                             History,
                             executionSettings: openAIPromptExecutionSettings,
                             kernel: kernel);

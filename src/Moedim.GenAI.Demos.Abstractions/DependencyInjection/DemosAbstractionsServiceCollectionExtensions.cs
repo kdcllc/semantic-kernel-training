@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 using Moedim.GenAI.Demos.Abstractions;
 using Moedim.GenAI.Demos.Abstractions.Options;
@@ -34,7 +32,7 @@ public static class DemosAbstractionsServiceCollectionExtensions
             });
 
         services.TryAddKeyedSingleton<Kernel>(
-            keyed, 
+            keyed,
             (sp, key) =>
             {
                 var options = sp.GetRequiredService<IOptionsMonitor<OpenAIOptions>>().Get(keyed);
@@ -44,19 +42,19 @@ public static class DemosAbstractionsServiceCollectionExtensions
                 if (options.Azure)
                 {
                     kernel.AddAzureOpenAIChatCompletion(
-                        options.CompletionModelId, 
-                        options.Endpoint, 
+                        options.CompletionModelId,
+                        options.Endpoint,
                         options.Key,
                         serviceId: keyed);
                 }
                 else
                 {
                     kernel.AddOpenAIChatCompletion(
-                        options.CompletionModelId, 
+                        options.CompletionModelId,
                         options.Key,
                         serviceId: keyed);
                 }
-  
+
                 return kernel.Build();
             });
 
