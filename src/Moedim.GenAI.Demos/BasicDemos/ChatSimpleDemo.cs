@@ -20,7 +20,7 @@ public class ChatSimpleDemo(Kernel kernel) : BaseDemo(kernel)
     /// <param name="kernel">The kernel instance.</param>
     /// <param name="userPrompt">The user prompt.</param>
     /// <returns>The response to the user prompt.</returns>
-    protected override async Task<string?> HandlePrompt(Kernel kernel, string userPrompt)
+    protected override async Task<string?> HandlePromptAsync(Kernel kernel, string userPrompt, CancellationToken cancellationToken )
     {
         KernelArguments arguments = [];
         var serviceId = nameof(ChatSimpleDemo);
@@ -29,6 +29,6 @@ public class ChatSimpleDemo(Kernel kernel) : BaseDemo(kernel)
             { serviceId, new PromptExecutionSettings() }
         };
 
-        return await kernel.InvokePromptAsync<string>(userPrompt, arguments);
+        return await kernel.InvokePromptAsync<string>(userPrompt, arguments, cancellationToken: cancellationToken);
     }
 }

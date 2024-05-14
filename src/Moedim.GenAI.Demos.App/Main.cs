@@ -33,8 +33,8 @@ public class Main(
 
         if (demo != null)
         {
-            await demo.RunAsync(_applicationLifetime.ApplicationStopping);
-
+            var cancellationToken = _applicationLifetime.ApplicationStopping;
+            await demo.RunAsync(cancellationToken);
             return 0;
         }
 

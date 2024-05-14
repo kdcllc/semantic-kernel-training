@@ -35,15 +35,18 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
     {
         History.AddSystemMessage(SystemMessage);
 
-        SystemMessage.Dump(colors: new ColorConfig { PropertyValueColor = Color.YellowGreen} );
+        SystemMessage.Dump(colors: new ColorConfig { PropertyValueColor = Color.YellowGreen });
+
+        Console.CancelKeyPress += (sender, e) => cancellationToken.ThrowIfCancellationRequested();
 
         while (!cancellationToken.IsCancellationRequested)
         {
             ScreenPrompt.Dump(colors: new ColorConfig { PropertyValueColor = Color.Aqua });
 
+
             var query = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(query))
+            if (string.IsNullOrEmpty(query))
             {
                 continue;
             }
@@ -56,7 +59,7 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
 
             History.AddUserMessage(query);
 
-            var result = await HandlePrompt(_kernel!, query);
+            var result = await HandlePromptAsync(_kernel!, query, cancellationToken);
 
             if (result is null)
             {
@@ -85,6 +88,7 @@ public abstract class BaseDemo(Kernel kernel) : IDemo
     /// </summary>
     /// <param name="kernel">The kernel instance.</param>
     /// <param name="userPrompt">The user prompt.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the response.</returns>
-    protected abstract Task<string?> HandlePrompt(Kernel kernel, string userPrompt);
+    protected abstract Task<string?> HandlePromptAsync(Kernel kernel, string userPrompt, CancellationToken cancellationToken);
 }

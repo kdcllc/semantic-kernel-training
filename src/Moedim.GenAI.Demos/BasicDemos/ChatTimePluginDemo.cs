@@ -14,7 +14,7 @@ namespace Moedim.GenAI.Demos.BasicDemos;
 public class ChatTimePluginDemo(Kernel kernel) : BaseDemo(kernel)
 {
 #pragma warning disable SKEXP0060 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-    
+
     //private HandlebarsPlanner _planner = new HandlebarsPlanner(new HandlebarsPlannerOptions());
 
     /// <inheritdoc/>
@@ -27,7 +27,7 @@ public class ChatTimePluginDemo(Kernel kernel) : BaseDemo(kernel)
     public override string ScreenPrompt => "What do you want to know about time?";
 
     /// <inheritdoc/>
-    protected override async Task<string?> HandlePrompt(Kernel kernel, string userPrompt)
+    protected override async Task<string?> HandlePromptAsync(Kernel kernel, string userPrompt, CancellationToken cancellationToken )
     {
         //const string promptDef = @"
         //    Today is: {{time.Date}}
@@ -98,7 +98,8 @@ public class ChatTimePluginDemo(Kernel kernel) : BaseDemo(kernel)
         var result = await chatCompletionService!.GetChatMessageContentAsync(
                             History,
                             executionSettings: openAIPromptExecutionSettings,
-                            kernel: kernel);
+                            kernel: kernel,
+                            cancellationToken: cancellationToken);
 
         return result.Content;
     }
