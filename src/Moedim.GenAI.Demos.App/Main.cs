@@ -1,40 +1,63 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Dumpify;
+
+using Microsoft.Extensions.Options;
+
 using Moedim.GenAI.Demos.Abstractions;
 
-public class Main : IMain
+using System.Drawing;
+
+public class Main(
+    IOptions<CliOptions> cliOptions,
+    IEnumerable<IDemo> demos,
+    IHostApplicationLifetime applicationLifetime,
+    IConfiguration configuration,
+    ILogger<Main> logger) : IMain
 {
-    private readonly ILogger<Main> _logger;
-    private readonly CliOptions _cliOptions;
-    private readonly IHostApplicationLifetime _applicationLifetime;
-    private readonly IEnumerable<IDemo> _demos;
+    private readonly ILogger<Main> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly CliOptions _cliOptions = cliOptions?.Value ?? throw new ArgumentNullException(nameof(cliOptions));
+    private readonly IHostApplicationLifetime _applicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
+    private readonly IEnumerable<IDemo> _demos = demos ?? throw new ArgumentNullException(nameof(demos));
 
-    public Main(
-        IOptions<CliOptions> cliOptions,
-        IEnumerable<IDemo> demos,
-        IHostApplicationLifetime applicationLifetime,
-        IConfiguration configuration,
-        ILogger<Main> logger)
-    {
-        _cliOptions = cliOptions?.Value ?? throw new ArgumentNullException(nameof(cliOptions));
-        _demos = demos ?? throw new ArgumentNullException(nameof(demos));
-        _applicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
-        Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    public IConfiguration Configuration { get; set; }
+    public IConfiguration Configuration { get; set; } = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
     public async Task<int> RunAsync()
     {
-        _logger.LogInformation("Requested: {optionType}", _cliOptions.Type);
+        if (DisplayAllDemos())
+        {
+            return -1;
+        }
+
+        _logger.LogInformation("Requested demo: {optionType}", _cliOptions.Type);
 
         var demo = _demos.FirstOrDefault(x => x.Name.Equals(_cliOptions?.Type?.Trim(), StringComparison.OrdinalIgnoreCase));
 
-        await demo.RunAsync();
-        
-        // use this token for stopping the services
-        _applicationLifetime.ApplicationStopping.ThrowIfCancellationRequested();
+        if (demo != null)
+        {
+            var cancellationToken = _applicationLifetime.ApplicationStopping;
+            await demo.RunAsync(cancellationToken);
+            return 0;
+        }
 
-        return 0;
+        return -1;
+    }
+
+    private bool DisplayAllDemos()
+    {
+        if (string.IsNullOrEmpty(_cliOptions.Type))
+        {
+            // display all of the possible demos
+            "No demo requested. Available demos:".Dump(colors: new ColorConfig { PropertyValueColor = Color.Red });
+
+            foreach (var d in _demos)
+            {
+                d.Name.Dump(colors: new ColorConfig { PropertyValueColor = Color.Red });
+            }
+
+            _logger.LogWarning("No demo requested.");
+
+            return true;
+        }
+
+        return false;
     }
 }

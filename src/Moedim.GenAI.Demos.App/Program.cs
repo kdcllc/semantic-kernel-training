@@ -11,11 +11,6 @@ AppHost.Start(args, Assembly.GetEntryAssembly()?.GetName().Name);
 // parse the cli options
 var options = Parser.Default.ParseArguments<CliOptions>(args);
 
-if (options.Errors.Any())
-{
-    return 1;
-}
-
 // Create a Serilog Logger
 Log.Logger = AppHost.CreateSerilogLogger(
     (logger, configuration, env) =>
@@ -43,6 +38,7 @@ try
 
     using var host = AppHost
                     .CreateHostBuilder()
+                    .ConfigureAppConfiguration(x => x.AddUserSecrets<Program>())
                     .ConfigureServices(services =>
                     {
                         services.AddOptions<CliOptions>()

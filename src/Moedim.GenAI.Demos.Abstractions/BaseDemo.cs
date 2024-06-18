@@ -1,45 +1,52 @@
-﻿using Microsoft.SemanticKernel;
-using Dumpify;
-using Moedim.GenAI.Demos.Abstractions.Options;
-using Microsoft.Extensions.Options;
+﻿using Dumpify;
+
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+
 using System.Drawing;
 
 namespace Moedim.GenAI.Demos.Abstractions;
 
-public abstract class BaseDemo : IDemo
+/// <summary>
+/// Represents a base class for demos.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="BaseDemo"/> class.
+/// </remarks>
+public abstract class BaseDemo(Kernel kernel) : IDemo
 {
-    private Kernel? _kernel;
+    private Kernel? _kernel = kernel;
 
-    public BaseDemo(IOptions<OpenAIOptions> options)
-    {
-        _kernel = CreateKernel(options.Value);
-    }
+    /// <summary>
+    /// Represents the chat history for the demo.
+    /// </summary>
+    public ChatHistory History = [];
 
+    /// <summary>
+    /// Gets the name of the demo.
+    /// </summary>
     public abstract string Name { get; }
 
-    public virtual Kernel CreateKernel(OpenAIOptions options)
+    /// <summary>
+    /// Runs the demo asynchronously.
+    /// </summary>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    public async Task RunAsync(CancellationToken cancellationToken)
     {
-        var kernel = Kernel.CreateBuilder();
+        History.AddSystemMessage(SystemMessage);
 
-        if (options.Azure){
-            kernel.AddAzureOpenAIChatCompletion(options.CompletionModelId, options.Endpoint, options.Key);
-        }
-        else{
-            kernel.AddOpenAIChatCompletion(options.CompletionModelId, options.Key);
-        }
+        SystemMessage.Dump(colors: new ColorConfig { PropertyValueColor = Color.YellowGreen });
 
-        return kernel.Build();
-    }
+        Console.CancelKeyPress += (sender, e) => cancellationToken.ThrowIfCancellationRequested();
 
-    public async Task RunAsync()
-    {
-        while (true)
+        while (!cancellationToken.IsCancellationRequested)
         {
             ScreenPrompt.Dump(colors: new ColorConfig { PropertyValueColor = Color.Aqua });
 
+
             var query = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(query))
+            if (string.IsNullOrEmpty(query))
             {
                 continue;
             }
@@ -49,8 +56,10 @@ public abstract class BaseDemo : IDemo
             {
                 break;
             }
-            
-            var result = await HandlePrompt(_kernel!, query);
+
+            History.AddUserMessage(query);
+
+            var result = await HandlePromptAsync(_kernel!, query, cancellationToken);
 
             if (result is null)
             {
@@ -58,14 +67,28 @@ public abstract class BaseDemo : IDemo
             }
             else
             {
+                History.AddAssistantMessage(result);
                 result.Dump();
             }
         }
     }
 
-   public virtual string ScreenPrompt => "How can I help you?";
+    /// <summary>
+    /// Gets the screen prompt for the demo.
+    /// </summary>
+    public virtual string ScreenPrompt => "How can I help you? (if done type 'exit')";
 
-    protected abstract Task<string?> HandlePrompt(Kernel kernel, string userPrompt);
+    /// <summary>
+    /// Gets the system message for the demo.
+    /// </summary>
+    public virtual string SystemMessage => "You're a virtual assistant that helps people find information.";
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    /// <summary>
+    /// Handles the user prompt and returns the response.
+    /// </summary>
+    /// <param name="kernel">The kernel instance.</param>
+    /// <param name="userPrompt">The user prompt.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the response.</returns>
+    protected abstract Task<string?> HandlePromptAsync(Kernel kernel, string userPrompt, CancellationToken cancellationToken);
 }

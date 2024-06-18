@@ -1,6 +1,6 @@
 ﻿namespace Moedim.GenAI.Demos.Abstractions;
 
-public interface IDemo //: IAsyncDisposable
+public interface IDemo
 {
     public string Name { get; }
 
@@ -8,5 +8,5 @@ public interface IDemo //: IAsyncDisposable
     /// Runs the demo.
     /// </summary>
     /// <returns>A task representing the asynchronous running operation.</returns>
-    Task RunAsync();
+    Task RunAsync(CancellationToken cancellationToken);
 }
